@@ -13,7 +13,7 @@ public class ObjectBinder : MonoBehaviour
         public Object target;
     }
 
-    public List<Item> items;
+    public List<Item> items = new List<Item>();
     private Dictionary<string, Object> data;
 
     public T Get<T>(string name) where T : Object
