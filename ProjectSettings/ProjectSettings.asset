@@ -163,7 +163,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.howe.objectbinder
+    Android: com.DefaultCompany.ObjectBinder
     Standalone: com.DefaultCompany.ObjectBinder
   buildNumber:
     Standalone: 0
@@ -761,7 +761,7 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Standalone: UIMODULE_YOOASSET;UIMODULE_UNITASK
+    Standalone: 
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}
