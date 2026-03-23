@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -8,7 +9,6 @@ namespace ObjectBinderEditor
     [InitializeOnLoad]
     public static class ObjectBinderHierarchyIcon
     {
-
         private static GUIStyle iconStyle;
         private static GUIStyle countStyle;
         private static GUIStyle bindedStyle;
@@ -16,7 +16,7 @@ namespace ObjectBinderEditor
         private const float COUNT_WIDTH = 30f;
         private const float MARGIN = 0f;
 
-        private static Dictionary<int,int> invalidCache = new Dictionary<int,int>();
+        private static Dictionary<int, (int total,int missing)> binderCache = new Dictionary<int, (int, int)>();
         private static HashSet<int> bindedObjectsCache = new HashSet<int>();
         private static bool cacheNeedsUpdate = true;
 
@@ -37,6 +37,7 @@ namespace ObjectBinderEditor
             if (!enable)
             {
                 RemoveEvents();
+                binderCache.Clear();
                 bindedObjectsCache.Clear();
             }
             else
@@ -45,6 +46,15 @@ namespace ObjectBinderEditor
                 AddEvents();
                 UpdateCache();
             }
+        }
+
+        public static void ForceUpdate()
+        {
+            if (!Enable)
+                return;
+
+            cacheNeedsUpdate = true;
+            EditorApplication.RepaintHierarchyWindow();
         }
 
         private static void AddEvents()
@@ -115,14 +125,9 @@ namespace ObjectBinderEditor
                 UpdateCache();
             }
 
-            GameObject obj = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
-
-            if (obj == null)
-                return;
-
-            if (obj.TryGetComponent<ObjectBinder>(out var binder))
+            if (binderCache.ContainsKey(instanceID))
             {
-                DrawBinderIcon(instanceID, binder, selectionRect);
+                DrawBinderIcon(instanceID, selectionRect);
                 return;
             }
 
@@ -132,14 +137,15 @@ namespace ObjectBinderEditor
             }
         }
 
-        private static void DrawBinderIcon(int instanceId, ObjectBinder binder, Rect selectionRect)
+        private static void DrawBinderIcon(int instanceId, Rect selectionRect)
         {
             GUIStyle currentIconStyle = new GUIStyle(iconStyle);
             GUIStyle currentCountStyle = new GUIStyle(countStyle);
             Color bgColor = new Color(0.5f, 0.5f, 0.5f, 0.5f);
 
-            int totalCount = binder.items.Count;
-            bool hasMissing = invalidCache.TryGetValue(instanceId, out int missingCount);
+            var (totalCount, missingCount) = binderCache[instanceId];
+
+            bool hasMissing = missingCount > 0;
 
             if (hasMissing)
             {
@@ -148,11 +154,9 @@ namespace ObjectBinderEditor
                 currentCountStyle.normal.textColor = new Color(1f, 0.3f, 0.3f);
             }
 
-
-            float xPos = selectionRect.xMax - ICON_WIDTH - COUNT_WIDTH - MARGIN * 2;
-
             if (totalCount > 0)
             {
+                float xPos = selectionRect.xMax - ICON_WIDTH - COUNT_WIDTH - MARGIN * 2;
                 Rect countRect = new Rect(xPos, selectionRect.y, COUNT_WIDTH, selectionRect.height);
                 string countText = hasMissing ? $"({totalCount}/{missingCount})" : $"({totalCount})";
 
@@ -174,9 +178,6 @@ namespace ObjectBinderEditor
 
         private static void UpdateCache()
         {
-            bindedObjectsCache.Clear();
-            invalidCache.Clear();
-
             List<ObjectBinder> allBinders = new List<ObjectBinder>();
 
             PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
@@ -194,58 +195,47 @@ namespace ObjectBinderEditor
                 allBinders.AddRange(Object.FindObjectsOfType<ObjectBinder>());
             }
 
+            binderCache.Clear();
+            bindedObjectsCache.Clear();
 
             foreach (var binder in allBinders)
             {
-                if (binder.items == null)
-                    continue;
-
-                foreach (var item in binder.items)
-                {
-                    if (item.target == null)
-                        continue;
-
-                    GameObject targetGameObject = null;
-
-                    if (item.target is GameObject go)
-                    {
-                        targetGameObject = go;
-                    }
-                    else if (item.target is Component comp)
-                    {
-                        targetGameObject = comp.gameObject;
-                    }
-
-                    if (targetGameObject != null)
-                    {
-                        int instanceID = targetGameObject.GetInstanceID();
-                        bindedObjectsCache.Add(instanceID);
-                    }
-                }
-
-                UpdateInvalidCache(binder);
+                UpdateCache(binder);
+                UpdateBindedCache(binder);
             }
         }
 
-        private static void UpdateInvalidCache(ObjectBinder binder)
+        private static void UpdateCache(ObjectBinder binder)
         {
-            if (binder == null || binder.items == null)
-                return;
+            var instanceId = binder.gameObject.GetInstanceID();
 
-            var count = 0;
+            var count = binder.items.Count;
+            var missingCount = binder.items.Count(p => !ObjectBinderHelper.Validate(binder, p.name, p.target));
 
+            binderCache[instanceId] = (count, missingCount);
+        }
+
+
+        private static void UpdateBindedCache(ObjectBinder binder)
+        {
             foreach (var item in binder.items)
             {
-                var isValid = ObjectBinderHelper.Validate(binder, item.name, item.target);
-                if (!isValid)
+                if (item.target == null)
+                    continue;
+                GameObject targetGameObject = null;
+                if (item.target is GameObject go)
                 {
-                    count++;
+                    targetGameObject = go;
                 }
-            }
-
-            if (count > 0)
-            {
-                invalidCache[binder.gameObject.GetInstanceID()] = count;
+                else if (item.target is Component comp)
+                {
+                    targetGameObject = comp.gameObject;
+                }
+                if (targetGameObject != null)
+                {
+                    int instanceID = targetGameObject.GetInstanceID();
+                    bindedObjectsCache.Add(instanceID);
+                }
             }
         }
     }

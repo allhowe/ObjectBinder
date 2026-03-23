@@ -57,6 +57,8 @@ namespace ObjectBinderEditor
             var itemsField = new PropertyField(itemsProperty);
             root.Add(itemsField);
 
+            root.TrackPropertyValue(itemsProperty, evt => ObjectBinderHierarchyIcon.ForceUpdate());
+
             var bindField = CreateBindField();
             root.Add(bindField);
 

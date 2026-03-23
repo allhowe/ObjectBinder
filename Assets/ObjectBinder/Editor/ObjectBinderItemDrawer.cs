@@ -19,6 +19,7 @@ namespace ObjectBinderEditor
         {
             var nameProp = property.FindPropertyRelative("name");
             var targetProp = property.FindPropertyRelative("target");
+            var binder = (ObjectBinder)property.serializedObject.targetObject;
 
             var root = CreateRoot();
 
@@ -50,7 +51,6 @@ namespace ObjectBinderEditor
 
             void Validate()
             {
-                var binder = (ObjectBinder)targetProp.serializedObject.targetObject;
                 var target = targetProp.objectReferenceValue;
                 var name = nameProp.stringValue;
 
