@@ -1,69 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class TestMonobehaviour : MonoBehaviour
 {
     #region ObjectBinder Auto Generated
 
     private ObjectBinder binder;
-    public GameObject Cube { get; private set; }
-    public MeshRenderer MeshRenderer_Cube { get; private set; }
-    public Transform Transform_UniversalBinder { get; private set; }
-    public Material Material_White { get; private set; }
-    public Material Material_Black { get; private set; }
+    public RawImage Image { get; private set; }
+    public Text Text { get; private set; }
+    public ObjectBinder ObjectBinder_TestMonobehaviour { get; private set; }
 
     public void InitBind()
     {
         binder = GetComponent<ObjectBinder>();
-        Cube = binder.Get<GameObject>(nameof(Cube));
-        MeshRenderer_Cube = binder.Get<MeshRenderer>(nameof(MeshRenderer_Cube));
-        Transform_UniversalBinder = binder.Get<Transform>(nameof(Transform_UniversalBinder));
-        Material_White = binder.Get<Material>(nameof(Material_White));
-        Material_Black = binder.Get<Material>(nameof(Material_Black));
+        Image = binder.Get<RawImage>(nameof(Image));
+        Text = binder.Get<Text>(nameof(Text));
+        ObjectBinder_TestMonobehaviour = binder.Get<ObjectBinder>(nameof(ObjectBinder_TestMonobehaviour));
     }
 
     #endregion ObjectBinder Auto Generated
-
-
-    public TestUniversal universal;
-    [HideInInspector]public float speed = 5;
 
     private void Start()
     {
         InitBind();
 
-        universal = new TestUniversal();
-        universal.InitBind(Transform_UniversalBinder.gameObject);
     }
 
-
-    void Update()
+    private int index;
+    public void ChangeImage()
     {
-        var start = transform.position;
-        var end = Transform_UniversalBinder.position;
+        if (index >= ObjectBinder_TestMonobehaviour.items.Count)
+            index = 0;
 
-        var t = (Cube.transform.position.x - start.x) / (end.x - start.x);
-
-        var color = Color.Lerp(Material_White.color, Material_Black.color, t);
-
-        MeshRenderer_Cube.material.color = color;
-
-
-        var dir = speed * Time.deltaTime * Vector3.right;
-
-        Cube.transform.Translate(dir);
-
-        if (end.x- Cube.transform.position.x<.5f)
-        {
-            Cube.transform.position = start;
-            universal.MeshRenderer_Cube.material.color = Material_Black.color;
-            Invoke("Hide", .1f);
-        }
-    }
-
-    void Hide()
-    {
-        universal.MeshRenderer_Cube.material.color = Material_White.color;
+        var image = ObjectBinder_TestMonobehaviour.items[index++].target as Texture2D;
+        Image.texture = image;
     }
 }
