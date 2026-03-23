@@ -101,20 +101,17 @@ namespace ObjectBinderEditor
 
         private static void OnHierarchyChanged()
         {
-            cacheNeedsUpdate = true;
-            EditorApplication.RepaintHierarchyWindow();
+            ForceUpdate();
         }
 
         private static void OnPrefabStageChanged(PrefabStage stage)
         {
-            cacheNeedsUpdate = true;
-            EditorApplication.RepaintHierarchyWindow();
+            ForceUpdate();
         }
 
         private static void OnPrefabStageClosing(PrefabStage stage)
         {
-            cacheNeedsUpdate = true;
-            EditorApplication.RepaintHierarchyWindow();
+            ForceUpdate();
         }
 
         private static void DrawHierarchyIcon(int instanceID, Rect selectionRect)

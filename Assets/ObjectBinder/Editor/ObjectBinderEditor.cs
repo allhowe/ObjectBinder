@@ -109,9 +109,18 @@ namespace ObjectBinderEditor
             {
                 area.style.backgroundColor = new Color(0.25f, 0.25f, 0.25f);
 
-                if (DragAndDrop.objectReferences.Length > 0)
+                var length = DragAndDrop.objectReferences.Length;
+
+                if (length == 1)
                 {
                     OnObjectDropped(DragAndDrop.objectReferences[0]);
+                }
+                if (length > 1)
+                {
+                    foreach (var item in DragAndDrop.objectReferences)
+                    {
+                        AddNonGameObjectItem(item);
+                    }
                 }
 
                 evt.StopPropagation();
