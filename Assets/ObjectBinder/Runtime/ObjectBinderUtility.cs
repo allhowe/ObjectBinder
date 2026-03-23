@@ -29,4 +29,9 @@ public static class ObjectBinderUtility
         input.onValueChanged.AddListener(action);
         onBinded?.Invoke(input);
     }
+    public static void SetDropdown(Dropdown dropdown, UnityAction<int> action)
+    {
+        dropdown.onValueChanged.AddListener(action);
+        onBinded?.Invoke(dropdown);
+    }
 }
