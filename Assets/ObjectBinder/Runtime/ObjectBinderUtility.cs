@@ -7,21 +7,26 @@ public static class ObjectBinderUtility
 {
     public static Action<UnityEngine.Object> onBinded;
 
-    public static void SetButton(Button btn, UnityAction onClick)
+    public static void SetButton(Button btn, UnityAction action)
     {
-        btn.onClick.AddListener(onClick);
+        btn.onClick.AddListener(action);
         onBinded?.Invoke(btn);
     }
 
-    public static void SetToggle(Toggle tog, UnityAction<bool> onClick)
+    public static void SetToggle(Toggle tog, UnityAction<bool> action)
     {
-        tog.onValueChanged.AddListener(onClick);
+        tog.onValueChanged.AddListener(action);
         onBinded?.Invoke(tog);
     }
 
-    public static void SetSlider(Slider slider, UnityAction<float> onClick)
+    public static void SetSlider(Slider slider, UnityAction<float> action)
     {
-        slider.onValueChanged.AddListener(onClick);
+        slider.onValueChanged.AddListener(action);
         onBinded?.Invoke(slider);
+    }
+    public static void SetInputField(InputField input, UnityAction<string> action)
+    {
+        input.onValueChanged.AddListener(action);
+        onBinded?.Invoke(input);
     }
 }
