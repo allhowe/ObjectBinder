@@ -21,7 +21,7 @@ namespace ObjectBinderEditor {
             return null;
         }
 
-        public bool IsValid(TextAsset asset)
+        public bool Validate(TextAsset asset)
         {
             if (asset == null)
             {

@@ -23,7 +23,7 @@ namespace ObjectBinderEditor
 
         public static IBuildRule GetBuildRule(TextAsset asset)
         {
-            return BuildRules.FirstOrDefault(p => p.IsValid(asset));
+            return BuildRules.FirstOrDefault(p => p.Validate(asset));
         }
 
         public static void ExecuteBinding(ObjectBinder binder)

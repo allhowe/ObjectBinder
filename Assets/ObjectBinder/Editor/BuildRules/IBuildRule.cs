@@ -6,7 +6,7 @@ namespace ObjectBinderEditor
     {
         int Priority { get; }
         TextAsset Bind(GameObject target);
-        bool IsValid(TextAsset asset);
+        bool Validate(TextAsset asset);
         void Build(ObjectBinder binder);
     }
 

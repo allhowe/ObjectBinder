@@ -21,7 +21,7 @@ namespace ObjectBinderEditor
 
                 var monoScript = MonoScript.FromMonoBehaviour(monoBehaviour);
 
-                if (universal.IsValid(monoScript))
+                if (universal.Validate(monoScript))
                 {
                     return monoScript;
                 }
@@ -29,7 +29,7 @@ namespace ObjectBinderEditor
             return null;
         }
 
-        public bool IsValid(TextAsset asset)
+        public bool Validate(TextAsset asset)
         {
             if (asset == null)
             {
@@ -53,7 +53,7 @@ namespace ObjectBinderEditor
                 return false;
             }
 
-            return universal.IsValid(monoScript);
+            return universal.Validate(monoScript);
         }
         public void Build(ObjectBinder binder)
         {
